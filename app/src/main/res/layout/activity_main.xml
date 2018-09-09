@@ -19,14 +19,6 @@
 
         </android.support.v7.widget.RecyclerView>
 
-        <TextView
-            android:id="@+id/internet_disconnected"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/internet"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
     </android.support.v4.widget.SwipeRefreshLayout>
 
 </layout>

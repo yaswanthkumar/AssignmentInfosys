@@ -17,6 +17,9 @@ public class ItemViewModel extends BaseObservable {
 
 
 
+
+
+
     private String title;
     private String description;
     private String imageUri;

@@ -3,6 +3,7 @@ package adapter;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,6 +36,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
             layoutInflater = LayoutInflater.from(parent.getContext());
 
         }
+
         //RowLayoutBinding binding = DataBindingUtil.inflate(layoutInflater,R.layout.row_layout, parent, false);
         View v= layoutInflater.inflate(R.layout.row_layout,parent,false);
 
