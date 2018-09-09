@@ -15,8 +15,7 @@ import model.ItemResponse;
 
 public class ItemViewModel extends BaseObservable {
 
-
-
+    //viewmodel class is used to get the data and bind to view it act as communicator for both view and model classes
     private String title;
     private String description;
     private String imageUri;

@@ -3,6 +3,9 @@ package model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+
+//Author:yaswanth
+//this is the modal class to get the data and set the data
 public class Item {
 
     private String title;

@@ -8,7 +8,7 @@ import model.ItemResponse;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-
+// this is used for creating retrofit building and get data from service in response object
 public class Call {
 
     private ProgressLoading loading;

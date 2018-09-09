@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+//item response modal class
 public class ItemResponse {
 
     @SerializedName("title")

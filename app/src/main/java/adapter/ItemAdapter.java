@@ -1,16 +1,15 @@
 package adapter;
 // Author : Yaswanth
+
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import com.infosys.myassignment.assignmentinfosys.databinding.RowLayoutBinding;
-import com.infosys.myassignment.assignmentinfosys.databinding.ActivityMainBinding;
 
+import com.infosys.myassignment.assignmentinfosys.databinding.RowLayoutBinding;
 import com.infosys.myassignment.assignmentinfosys.R;
 
 import java.util.List;
@@ -18,31 +17,33 @@ import java.util.List;
 import model.Item;
 import model.ItemResponse;
 import viewmodel.ItemViewModel;
-public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder> {
 
+//Custom Addapter to create ui
+public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder> {
     private ItemResponse itemResponse;
     private Context context;
     private List<Item.Row> rows;
-    private  LayoutInflater layoutInflater;
-
+    private LayoutInflater layoutInflater;
 
 
     @NonNull
     @Override
     public ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        if(layoutInflater == null) {
+        if (layoutInflater == null) {
             layoutInflater = LayoutInflater.from(parent.getContext());
 
         }
-        //RowLayoutBinding binding = DataBindingUtil.inflate(layoutInflater,R.layout.row_layout, parent, false);
-        View v= layoutInflater.inflate(R.layout.row_layout,parent,false);
 
-        ItemViewHolder vh= new ItemViewHolder(v);
+        //RowLayoutBinding binding = DataBindingUtil.inflate(layoutInflater,R.layout.row_layout, parent, false);
+        View v = layoutInflater.inflate(R.layout.row_layout, parent, false);
+
+        ItemViewHolder vh = new ItemViewHolder(v);
 
         return vh;
     }
 
+    //this is onBindViewHolder binding the data to view
     @Override
     public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
         RowLayoutBinding binding = holder.binding;
@@ -55,14 +56,13 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
     }
 
 
-
-    public ItemAdapter(ItemResponse itemResponse ) {
-        this.itemResponse  = itemResponse ;
+    public ItemAdapter(ItemResponse itemResponse) {
+        this.itemResponse = itemResponse;
         rows = itemResponse.getRows();
     }
 
-
-    public static  class ItemViewHolder extends RecyclerView.ViewHolder {
+    //create viewholder to bind  and unbind view with data
+    public static class ItemViewHolder extends RecyclerView.ViewHolder {
         private RowLayoutBinding binding;
 
 
@@ -83,8 +83,6 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
                 binding.unbind(); // Don't forget to unbind
             }
         }
-
-
 
     }
 }
