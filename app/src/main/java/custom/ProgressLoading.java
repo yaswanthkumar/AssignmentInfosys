@@ -3,7 +3,7 @@ package custom;
 import android.app.ProgressDialog;
 import android.content.Context;
 
-//show progress bar
+//show progress bar when ever the sevice call it will show only dialog
 public class ProgressLoading {
     private Context context;
     private ProgressDialog progressDialog;

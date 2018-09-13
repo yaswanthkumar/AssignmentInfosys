@@ -1,11 +1,16 @@
-package com.vaibhavapps.cpwslogs;
+package persistence;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.util.Log;
 
+import java.io.File;
 import java.util.ArrayList;
+
+import static persistence.DatabaseHelper.DB_NAME;
 
 public class DBManager  {
         private DatabaseHelper dbHelper;
@@ -27,52 +32,97 @@ public class DBManager  {
         public void close() {
         dbHelper.close();
         }
-    public void insert(String shed_log, String temperature, String humidity, String ammonia, String treatment, String date) {
+    public void insert(String title, String description, String url) {
         ContentValues contentValue = new ContentValues();
-        contentValue.put(DatabaseHelper.SHED_LOG_ID, shed_log);
-        contentValue.put(DatabaseHelper.TEMPERATURE, temperature);
-        contentValue.put(DatabaseHelper.HUMIDITY, humidity);
-        contentValue.put(DatabaseHelper.AMMONIUM, ammonia);
-        contentValue.put(DatabaseHelper.TREATMENT, treatment);
-        contentValue.put(DatabaseHelper.DATE, date);
+        contentValue.put(DatabaseHelper.TITLE, title);
+        contentValue.put(DatabaseHelper.DESCRIPTION, description);
+        contentValue.put(DatabaseHelper.IMAGE_URL, url);
+
         database.insert(DatabaseHelper.TABLE_NAME, null, contentValue);
     }
+
     public Cursor fetch() {
-            String[] cols = new String[]{DatabaseHelper._ID, DatabaseHelper.SHED_LOG_ID, DatabaseHelper.TEMPERATURE, DatabaseHelper.HUMIDITY, DatabaseHelper.AMMONIUM, DatabaseHelper.TREATMENT, DatabaseHelper.DATE};
+            String[] cols = new String[]{DatabaseHelper._ID, DatabaseHelper.TITLE, DatabaseHelper.DESCRIPTION, DatabaseHelper.IMAGE_URL};
             Cursor cursor = database.query(DatabaseHelper.TABLE_NAME, cols, null, null, null, null, null);
             if (cursor != null) {
                 cursor.moveToFirst();
             }
             return cursor;
         }
-    public ArrayList<LogDataHelper> readAllItems(String ids) {
-        ArrayList<LogDataHelper> items = new ArrayList<LogDataHelper>();
+
+    //it check data base exists or not
+    public boolean checkDataBase() {
+
+        SQLiteDatabase checkDB = null;
+
+        try {
+            File database=context.getDatabasePath(DB_NAME);
+
+            if (database.exists()) {
+
+                Log.i("Database", "Found");
+
+                String myPath = database.getAbsolutePath();
+
+                Log.i("Database Path", myPath);
+
+                checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
+
+            } else {
+
+                // Database does not exist so copy it from assets here
+                Log.i("Database", "Not Found");
+
+            }
+
+        } catch(SQLiteException e) {
+
+            Log.i("Database", "Not Found");
+
+        } finally {
+
+            if(checkDB != null) {
+
+                checkDB.close();
+
+            }
+
+        }
+
+        return checkDB != null ? true : false;
+    }
+
+
+
+
+    //retrive all data from table in this cursor object is used th retrive the data row by row
+    public ArrayList<ItemDatabaseHelper> readAllItems() {
+        ArrayList<ItemDatabaseHelper> list = new ArrayList<ItemDatabaseHelper>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String[] cols = new String[]{DatabaseHelper.SHED_LOG_ID, DatabaseHelper.TEMPERATURE, DatabaseHelper.HUMIDITY, DatabaseHelper.AMMONIUM, DatabaseHelper.TREATMENT, DatabaseHelper.DATE};
+        String[] cols = new String[]{DatabaseHelper.TITLE, DatabaseHelper.DESCRIPTION, DatabaseHelper.IMAGE_URL};
 
-        String selection = DatabaseHelper.SHED_LOG_ID + " = ?";
-        String[] selectionArgs = {ids};
-
-        Cursor cursor = db.query(DatabaseHelper.TABLE_NAME, cols, selection, selectionArgs, null, null,null);
+        Cursor cursor = db.query(DatabaseHelper.TABLE_NAME, cols, null, null, null, null,null);
 
         if (cursor != null ) {
             while (cursor.moveToNext()) {
-                LogDataHelper item = new LogDataHelper();
-                item.id = cursor.getString(0);
-                item.temperature = cursor.getString(1);
-                item.humidity = cursor.getString(2);
-                item.ammonium = cursor.getString(3);
-                item.treatment = cursor.getString(4);
-                item.date = cursor.getString(5);
-                items.add(item);
+                ItemDatabaseHelper item = new ItemDatabaseHelper();
+                //item.id = cursor.getString(0);
+                item.Title = cursor.getString(0);
+                item.Description = cursor.getString(1);
+                item.url = (String) cursor.getString(2);
+                list.add(item);
             }
         }
-        return items;
+        return list;
         }
+
+    //delete data from table
     public void delete() {
             SQLiteDatabase db = dbHelper.getWritableDatabase();
             String deleteQueries = "DELETE FROM " + DatabaseHelper.TABLE_NAME;
             db.execSQL(deleteQueries);
-            db.close();
+            //db.close();
     }
+
+
 }

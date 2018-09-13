@@ -5,7 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
-//check networkstatus
+//check networkstatus of the app weather the mobile is connected to network or not
 public class NetworkStatus {
 
     private static NetworkStatus instance = new NetworkStatus();

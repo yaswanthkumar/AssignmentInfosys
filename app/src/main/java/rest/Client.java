@@ -2,7 +2,7 @@ package rest;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
+//this is the base class to create retrofit request
 public class Client {
 
     //https://dl.dropboxusercontent.com/s/2iodh4vg0eortkl/facts.json
