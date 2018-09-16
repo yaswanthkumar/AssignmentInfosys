@@ -4,6 +4,8 @@ import android.app.Application;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
@@ -43,9 +45,10 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recycleview;
     SwipeRefreshLayout mswipeRefreshLayout;
     private String errorMessage;
-    ArrayList<ItemDatabaseHelper> items;
     List<String> data;
-    StringBuilder builder = new StringBuilder();
+    private MyNetworkReceiver myReceiver;
+    IntentFilter filter;
+
 
     //onRefresh of recycler view on pull down
     @Override
@@ -72,42 +75,18 @@ public class MainActivity extends AppCompatActivity {
         //binding view to binding calss
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         binding.recycleview.setLayoutManager(new LinearLayoutManager(this));
+        BindingHelper.getInstance().setInstanceDependences(binding,getSupportActionBar(),getApplicationContext());
 
         //calling service to fetch data
         actionCall = new Call(this, new Call.Delegate() {
             @Override
             public void onSuccess(ItemResponse itemResponse) {
-                binding.recycleview.setAdapter(new ItemAdapter(itemResponse));
-                getSupportActionBar().setTitle(itemResponse.getTitle());
-                //calling the dbmanager to acces data base and getting the data from service and saving that in local storage
-                DBManager dbManager;
-                dbManager = new DBManager(getApplicationContext());
-                dbManager.open();
-                dbManager.delete();
-                for (int i = 0; i < itemResponse.getRows().size(); i++) {
-                    String dbtitle = itemResponse.getRows().get(i).getTitle();
-                    String des = itemResponse.getRows().get(i).getDescription();
-                    String url = (String) itemResponse.getRows().get(i).getImageHref();
-                    dbManager.insert(dbtitle, des, url);
-                    Log.v("Yaswanth", dbtitle + des + url);
-                }
-                dbManager.close();
-
-                binding.userMessage.setVisibility(View.GONE);
-                binding.recycleview.setVisibility(View.VISIBLE);
+                BindingHelper.getInstance().displayOnConneted(itemResponse);
             }
 
             @Override
             public void onFailure(Object t) {
-                //errorMessage = "Error while fetching data  = " + t.toString();
-                Toast.makeText(getApplicationContext(), "App is in offline mode" , Toast.LENGTH_LONG).show();
-                //showErrorMessage(errorMessage);
-                ItemResponse response= getData();
-                getSupportActionBar().setTitle(response.getTitle());
-                binding.recycleview.setAdapter(new ItemAdapter(response));
-                //Toast.makeText(getApplicationContext(), "data is = " + data, Toast.LENGTH_LONG).show();
-                binding.userMessage.setVisibility(View.GONE);
-                binding.recycleview.setVisibility(View.VISIBLE);
+                BindingHelper.getInstance().getOfflineData();
 
             }
         });
@@ -116,16 +95,21 @@ public class MainActivity extends AppCompatActivity {
             actionCall.execute();
 
         } else {
-            errorMessage = "Please check your internet connection";
+            BindingHelper.getInstance().getOfflineData();
         }
-        showErrorMessage(errorMessage);
 
 
+        myReceiver = new MyNetworkReceiver(binding);
+        filter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
+
+        Intent intent = new Intent();
+        intent.setAction("com.infosys.myassignment.assignmentinfosys");
+        sendBroadcast(intent);
     }
 
     //retriving data and set that in response that are binding to view holder
     public ItemResponse getData() {
-        items = new ArrayList<ItemDatabaseHelper>();
+        ArrayList<ItemDatabaseHelper> items = new ArrayList<ItemDatabaseHelper>();
         DBManager dbManager;
         ItemResponse model= new ItemResponse();
         dbManager = new DBManager(getApplicationContext());
@@ -151,12 +135,12 @@ public class MainActivity extends AppCompatActivity {
         //int orientation = this.getResources().getConfiguration().orientation;
         if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             Log.d("Portrait ", "PPPPPPPPPPPPPPPPP");
-            Toast.makeText(getApplicationContext(), "YOU CHANGED TO POTRATE", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), "YOU CHANGED TO POTRATE", Toast.LENGTH_LONG).show();
 
 
         } else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             Log.d("Lanscape", "LLLLLLLLLLLLLLLLLLLL");
-            Toast.makeText(getApplicationContext(), " YOU CHANGED TO LANDSCAPE", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), " YOU CHANGED TO LANDSCAPE", Toast.LENGTH_LONG).show();
 
         }
     }
@@ -178,17 +162,28 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void showErrorMessage(String errorMessage) {
-        if (errorMessage != null && !errorMessage.trim().isEmpty()) {
-            binding.userMessage.setText(errorMessage.trim());
-            binding.userMessage.setVisibility(View.VISIBLE);
-            binding.recycleview.setVisibility(View.GONE);
-        }
-    }
-
     public void fetchTimelineAsync(int page) {
         actionCall.execute();
         mswipeRefreshLayout.setRefreshing(false);
     }
-}
 
+
+    protected void onPause() {
+        unregisterReceiver(myReceiver);
+        super.onPause();
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(myReceiver, filter);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+    }
+}

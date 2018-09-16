@@ -62,6 +62,8 @@ public class ItemViewModel extends BaseObservable {
         Glide.with(view.getContext())
                 .load(imageUrl)
                 .placeholder(R.drawable.ic_launcher_background)
+                .override(100,100)
+                .centerCrop()
                 .into(view);
     }
 
